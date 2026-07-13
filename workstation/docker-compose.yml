@@ -1,0 +1,32 @@
+name: openwebui-workstation
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      WEBUI_SECRET_KEY: "${WEBUI_SECRET_KEY:-replace-with-a-long-random-secret}"
+      OLLAMA_BASE_URL: "${OLLAMA_BASE_URL:-}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  computer:
+    image: ghcr.io/open-webui/computer:latest
+    container_name: openwebui-computer
+    restart: unless-stopped
+    ports:
+      - "${COMPUTER_PORT:-8000}:8000"
+    volumes:
+      - computer-data:/data
+      - ./workspace:/workspace
+    working_dir: /workspace
+
+volumes:
+  open-webui-data:
+  computer-data:
